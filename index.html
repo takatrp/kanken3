@@ -235,7 +235,7 @@ const BUSHU_SYNONYM = new Map([
   ['しめすへん',['しめすへん','ネ偏']],
   ['ころもへん',['ころもへん','衤']],
 ]);
-function normKana(s){ return (s||'').trim().replace(/\s+/g,'').replace(/[ァ-ン]/g, ch=>String.fromCharCode(ch.charCodeAt(0)-0)); }
+function normKana(s){ return (s||'').trim().replace(/\s+/g,'').replace(/[ァ-ン]/g, ch=>String.fromCharCode(ch.charCodeAt(0)-0x60)); }
 function isBushuOK(input, target){
   const n=(input||'').trim();
   if(!n||!target) return false;
