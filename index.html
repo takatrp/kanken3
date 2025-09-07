@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>漢検3級トレーナー r4（読み・送り仮名・部首／データ差替で500問化）</title>
+<title>漢検3級トレーナー r4.1（読み・送り仮名・部首／CSV強化）</title>
 <style>
 :root{--accent:#578899}
 *{box-sizing:border-box}
@@ -13,7 +13,7 @@ h1{font-size:18px;margin:0;color:var(--accent)}
 .card{background:#fff;border:1px solid #e5e9ef;border-radius:12px;padding:14px;margin:10px 0;box-shadow:0 1px 0 rgba(0,0,0,.02)}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .row>*{flex:1 1 200px}
-select,button,input,textarea{font-size:16px;padding:10px;border-radius:10px;border:1px solid #cfd8e3;background:#fff}
+select,button,input{font-size:16px;padding:10px;border-radius:10px;border:1px solid #cfd8e3;background:#fff}
 button.primary{background:var(--accent);color:#fff;border:none}
 button.ghost{background:#f2f5f8}
 .q-main{font-size:42px;text-align:center;letter-spacing:.04em;margin:8px 0}
@@ -30,7 +30,7 @@ button.ghost{background:#f2f5f8}
 .foot{font-size:12px;opacity:.7;text-align:center;margin:8px 0}
 .hidden{display:none}
 .tag{font-size:11px;border:1px solid #d8e2ee;border-radius:6px;padding:2px 6px;margin-left:6px}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 .progress{height:8px;border-radius:999px;background:#e8eef6;overflow:hidden}
 .progress>i{display:block;height:100%;background:var(--accent);width:0%}
 .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
@@ -43,7 +43,7 @@ kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef;padding:0 
 </head>
 <body>
 <header>
-  <h1>漢検3級トレーナー <span class="tag">r4</span> <span class="tag">読み・送り仮名・部首</span></h1>
+  <h1>漢検3級トレーナー <span class="tag">r4.1</span> <span class="tag">読み・送り仮名・部首</span></h1>
 </header>
 
 <div class="wrap">
@@ -100,45 +100,39 @@ kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef;padding:0 
     <div class="row">
       <div>
         <button id="examBtn" class="ghost">検定モード（40問・200点満点）</button><br>
-        <label class="small muted">合格目安：70%（140点）※漢検公式記載の一般目安</label>
+        <label class="small muted">合格目安：70%（140点）</label>
       </div>
       <div>
-        <label class="muted">データ読み込み（JSON/CSV）</label><br>
-        <input type="file" id="fileInput" accept=".json,.csv">
+        <label class="muted">データ読み込み（JSON/CSV/TSV対応）</label><br>
+        <input type="file" id="fileInput" accept=".json,.csv,.tsv,.txt">
       </div>
       <div class="center">
         <button id="resetBtn">進捗リセット</button>
       </div>
     </div>
     <details>
-      <summary>CSV仕様（500問パック対応）</summary>
+      <summary>CSV仕様（500問パック用）</summary>
       <pre class="mono" style="white-space:pre-wrap">
-# 列（カンマ区切り）※行頭#はコメント
-# type は yomi / okuri / bushu のいずれか
 type,kanji,readings,okuri_choices,okuri_ans,bushu,ex
-# 例（読み）
-yomi,境内,"けいだい",,,,神社の境内はにぎわう
-# 例（送り仮名：文化庁告示準拠の正解をokuri_ansに）
-okuri,受け,"",受け入れ|受入れ|受入,受け入れ,,
-# 例（部首名：一般的呼称。にんべん/イ偏 等の別名も許容）
+# 例（読み） readingsは「|」区切り。区切りに「、／/」を書いても自動で「|」に正規化。
+yomi,境内,けいだい,,,,
+# 例（送り仮名） 選択肢は「|」区切り。okuri_ans は必ず choices のいずれかと完全一致。
+okuri,受け,,受け入れ|受入れ|受入,受け入れ,,
+# 例（部首）
 bushu,体,"",,,"にんべん",</pre>
-      <div class="muted">※ readingsは「|」区切り複数可。部首名は一般的呼称（さんずい/てへん/にんべん/くさかんむり/かねへん/くちへん/りっしんべん 等）で統一。</div>
+      <div class="muted">※ ヘッダは自動認識。TSVも可。エンコードはUTF-8推奨。</div>
     </details>
     <div class="muted mono" id="miniLog"></div>
   </div>
 
   <div class="foot">
-    © Matsumoto Kaikei / Kanken3 r4（SRS保存・データ差替で500問化）<br>
-    根拠：<a href="#" onclick="alert('漢検公式「各級の概要」：3級=対象1623字／200点満点・合格70%程度');return false;">漢検各級の概要</a>／
-    <a href="#" onclick="alert('文化庁「送り仮名の付け方」通則');return false;">送り仮名の付け方</a>／
-    <a href="#" onclick="alert('常用漢字表（平成22年内閣告示第2号）');return false;">常用漢字表</a>／
-    <a href="#" onclick="alert('EDRDG KANJIDIC2（部首・音訓の機械可読データ）');return false;">KANJIDIC2</a>
+    © Matsumoto Kaikei / Kanken3 r4.1（SRS保存・CSV差替） — 参照規範：送り仮名の付け方／常用漢字表／KANJIDIC2（帰属要）
   </div>
 </div>
 
 <script>
 /*** ---------- SRS／進捗 ---------- ***/
-const SRS_KEY="kanken3_srs_r4"; const STATS_KEY="kanken3_stats_r4";
+const SRS_KEY="kanken3_srs_r41"; const STATS_KEY="kanken3_stats_r41";
 function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
 function loadSRS(){ try{return JSON.parse(localStorage.getItem(SRS_KEY))||{}}catch(e){return{}} }
 function saveSRS(s){ localStorage.setItem(SRS_KEY, JSON.stringify(s)); }
@@ -186,19 +180,25 @@ function pick(){
 
 /*** ---------- 出題描画 ---------- ***/
 function setQuestion(){
+  const mode=els.mode.value;
+  // モードに該当するデータがない場合のガード
+  if(!DATA.some(d=>d.type===mode)){
+    els.qMain.textContent='データがありません';
+    els.qSub.textContent='このモードの行（type='+mode+'）がCSVに含まれているか確認してください';
+    els.answer?.focus(); return;
+  }
   cur=pick(); els.ans.value=""; els.fb.textContent=""; els.choice.classList.add('hidden'); els.ansBox.classList.remove('hidden');
-  const m=els.mode.value;
-  if(m==='yomi'){
+  if(mode==='yomi'){
     const base=(cur.type==='yomi'?cur:pickType('yomi'));
     els.qMain.textContent=base.kanji||'—'; els.qSub.textContent='読み（かな）を入力'; cur=base;
-  }else if(m==='okuri'){
+  }else if(mode==='okuri'){
     const base=(cur.type==='okuri'?cur:pickType('okuri'));
     els.qMain.textContent = `${base.kanji}（送り仮名）`;
     els.qSub.textContent='正しい表記を選択';
     showChoices(shuffle(base.okuri_choices)); cur=base;
-  }else if(m==='bushu'){
+  }else if(mode==='bushu'){
     const base=(cur.type==='bushu'?cur:pickType('bushu'));
-    els.qMain.textContent=base.kanji; els.qSub.textContent='部首名を入力（例：さんずい、てへん、にんべん…）'; cur=base;
+    els.qMain.textContent=base.kanji; els.qSub.textContent='部首名を入力（例：にんべん／てへん／さんずい…）'; cur=base;
   }
   els.ans.focus();
 }
@@ -215,9 +215,11 @@ function showChoices(arr){
 }
 
 /*** ---------- 判定 ---------- ***/
+// カタカナ→ひらがな（修正版 -0x60）、空白除去
+function normKana(s){ return (s||'').trim().replace(/\s+/g,'').replace(/[ァ-ン]/g, ch=>String.fromCharCode(ch.charCodeAt(0)-0x60)); }
 const BUSHU_SYNONYM = new Map([
-  ['にんべん',['にんべん','イ偏','イへん','にんにょう?']], // にょう誤タイプ救済
-  ['てへん',['てへん','手偏']],
+  ['にんべん',['にんべん','イ偏','イへん','亻']],
+  ['てへん',['てへん','手偏','扌']],
   ['さんずい',['さんずい','氵']],
   ['きへん',['きへん','木偏']],
   ['くさかんむり',['くさかんむり','艹']],
@@ -225,17 +227,16 @@ const BUSHU_SYNONYM = new Map([
   ['くちへん',['くちへん','口偏']],
   ['りっしんべん',['りっしんべん','忄','心偏']],
   ['ひへん',['ひへん','火偏','灬']],
-  ['こざとへん',['こざとへん']],
-  ['しんにょう',['しんにょう','辶']],
+  ['こざとへん',['こざとへん','阝']],
+  ['しんにょう',['しんにょう','辶','⻌','⻍']],
   ['つちへん',['つちへん','土偏']],
   ['やまへん',['やまへん','山偏']],
   ['あめかんむり',['あめかんむり','雨冠']],
   ['うかんむり',['うかんむり','宀']],
   ['いとへん',['いとへん','糸偏','糹']],
-  ['しめすへん',['しめすへん','ネ偏']],
+  ['しめすへん',['しめすへん','ネ偏','示偏']],
   ['ころもへん',['ころもへん','衤']],
 ]);
-function normKana(s){ return (s||'').trim().replace(/\s+/g,'').replace(/[ァ-ン]/g, ch=>String.fromCharCode(ch.charCodeAt(0)-0x60)); }
 function isBushuOK(input, target){
   const n=(input||'').trim();
   if(!n||!target) return false;
@@ -275,37 +276,27 @@ els.revealBtn.onclick=()=>{
 };
 els.ans.addEventListener('keydown',e=>{ if(e.key==='Enter') check(); });
 els.exam.onclick=()=>{ exam=true; left=40; score=0; els.stat.textContent='検定モード開始（40問）'; setQuestion(); };
-els.file.onchange=async (e)=>{
-  const f=e.target.files[0]; if(!f) return;
-  try{
-    const txt=await f.text();
-    if(f.name.endsWith('.json')){ DATA=JSON.parse(txt); }
-    else{ DATA=parseCSV(txt); }
-    localStorage.removeItem(SRS_KEY); localStorage.removeItem(STATS_KEY);
-    SRS={}; ST={r:0,w:0,st:0,td:0,date:todayStr()}; saveStats(ST);
-    els.log.textContent=`データ読込完了：${DATA.length}件`; updateHUD(); setQuestion();
-  }catch(err){ els.log.textContent='読込エラー：'+err.message; }
-};
-els.reset.onclick=()=>{
-  if(confirm('学習履歴（SRS/統計）をリセットしますか？')){
-    localStorage.removeItem(SRS_KEY); localStorage.removeItem(STATS_KEY);
-    SRS={}; ST={r:0,w:0,st:0,td:0,date:todayStr()}; saveStats(ST); updateHUD();
-    els.log.textContent='進捗をリセットしました';
-  }
-};
 
-/*** ---------- CSV/JSONハンドラ ---------- ***/
+/*** ---------- CSV/JSONハンドラ（堅牢化版） ---------- ***/
 function parseCSV(text){
-  const lines=text.split(/\r?\n/).filter(x=>x.trim()&&!x.trim().startsWith('#'));
+  // 改行（CRLF/CR/LF）＆コメント(#)除去
+  const lines=text.split(/\r\n|\n|\r/).filter(x=>x.trim()!=='' && !x.trim().startsWith('#'));
   const arr=[];
   for(const ln of lines){
-    const cols=splitCSV(ln);
+    // TSVのみ→カンマに変換
+    const line = ln.includes('\t') && !ln.includes(',') ? ln.replace(/\t/g,',') : ln;
+    const cols=splitCSV(line);
+    // ヘッダ自動スキップ
+    if(/^type\s*$/i.test((cols[0]||'').trim())) continue;
     const [type,kanji,readings,okuri_choices,okuri_ans,bushu,ex]=cols;
+    // readings/choices の区切り揺れを | に正規化（、／/）
+    const rnorm=(readings||'').replace(/[、／/]/g,'|');
+    const cnorm=(okuri_choices||'').replace(/[、／/]/g,'|');
     arr.push({
-      type:(type||'').trim(),
+      type:(type||'').trim().toLowerCase(),
       kanji:(kanji||'').trim(),
-      readings:(readings||'').split('|').filter(Boolean),
-      okuri_choices:(okuri_choices||'').split('|').filter(Boolean),
+      readings:rnorm.split('|').map(s=>s.trim()).filter(Boolean),
+      okuri_choices:cnorm.split('|').map(s=>s.trim()).filter(Boolean),
       okuri_ans:(okuri_ans||'').trim(),
       bushu:(bushu||'').trim(),
       ex:(ex||'').trim()
@@ -314,6 +305,7 @@ function parseCSV(text){
   return arr;
 }
 function splitCSV(line){
+  // シンプルCSV（"で囲まれたカンマと二重引用対応）
   const out=[]; let cur=''; let q=false;
   for(let i=0;i<line.length;i++){
     const ch=line[i];
@@ -323,117 +315,45 @@ function splitCSV(line){
   }
   out.push(cur); return out;
 }
+function summarizeLoadedData(){
+  const y=DATA.filter(d=>d.type==='yomi').length;
+  const o=DATA.filter(d=>d.type==='okuri').length;
+  const b=DATA.filter(d=>d.type==='bushu').length;
+  const bad=DATA.filter(d=>!['yomi','okuri','bushu'].includes(d.type)).slice(0,3);
+  els.log.textContent=`読込：合計${DATA.length}件（読み${y}・送り${o}・部首${b}）` +
+    (bad.length? `／不明type先頭: ${bad.map(x=>x.type||'(空)').join(', ')}`:'');
+}
+els.file.onchange=async (e)=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const txt=await f.text();
+    if(f.name.endsWith('.json')){ DATA=JSON.parse(txt); }
+    else{ DATA=parseCSV(txt); }
+    // 進捗リセット
+    localStorage.removeItem(SRS_KEY); localStorage.removeItem(STATS_KEY);
+    SRS={}; ST={r:0,w:0,st:0,td:0,date:todayStr()}; saveStats(ST);
+    updateHUD(); summarizeLoadedData(); setQuestion();
+  }catch(err){ els.log.textContent='読込エラー：'+err.message; }
+};
+
+/*** ---------- util ---------- ***/
 function shuffle(a){ return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
 
-/*** ---------- 内蔵スターターパック（安全例） ---------- ***/
+/*** ---------- 内蔵スターターパック（最小・動作確認用） ---------- ***/
 let DATA = [
-  // 読み（60例：安全な汎用語）
+  // 読み（サンプル）
   {type:"yomi", kanji:"安全", readings:["あんぜん"]},
-  {type:"yomi", kanji:"安定", readings:["あんてい"]},
-  {type:"yomi", kanji:"案内", readings:["あんない"]},
-  {type:"yomi", kanji:"以外", readings:["いがい"]},
-  {type:"yomi", kanji:"以前", readings:["いぜん"]},
-  {type:"yomi", kanji:"以上", readings:["いじょう"]},
-  {type:"yomi", kanji:"移動", readings:["いどう"]},
-  {type:"yomi", kanji:"意見", readings:["いけん"]},
-  {type:"yomi", kanji:"意識", readings:["いしき"]},
-  {type:"yomi", kanji:"位置", readings:["いち"]},
-  {type:"yomi", kanji:"一部", readings:["いちぶ"]},
-  {type:"yomi", kanji:"一体", readings:["いったい"]},
-  {type:"yomi", kanji:"一方", readings:["いっぽう"]},
-  {type:"yomi", kanji:"依頼", readings:["いらい"]},
-  {type:"yomi", kanji:"運動", readings:["うんどう"]},
-  {type:"yomi", kanji:"運転", readings:["うんてん"]},
-  {type:"yomi", kanji:"営業", readings:["えいぎょう"]},
-  {type:"yomi", kanji:"映画", readings:["えいが"]},
-  {type:"yomi", kanji:"栄養", readings:["えいよう"]},
   {type:"yomi", kanji:"影響", readings:["えいきょう"]},
-  {type:"yomi", kanji:"温度", readings:["おんど"]},
-  {type:"yomi", kanji:"温泉", readings:["おんせん"]},
-  {type:"yomi", kanji:"会員", readings:["かいいん"]},
-  {type:"yomi", kanji:"会社", readings:["かいしゃ"]},
-  {type:"yomi", kanji:"会議", readings:["かいぎ"]},
-  {type:"yomi", kanji:"開始", readings:["かいし"]},
-  {type:"yomi", kanji:"海外", readings:["かいがい"]},
-  {type:"yomi", kanji:"回復", readings:["かいふく"]},
-  {type:"yomi", kanji:"解決", readings:["かいけつ"]},
-  {type:"yomi", kanji:"改正", readings:["かいせい"]},
-  {type:"yomi", kanji:"価格", readings:["かかく"]},
-  {type:"yomi", kanji:"科学", readings:["かがく"]},
   {type:"yomi", kanji:"家族", readings:["かぞく"]},
-  {type:"yomi", kanji:"可能", readings:["かのう"]},
-  {type:"yomi", kanji:"学習", readings:["がくしゅう"]},
-  {type:"yomi", kanji:"学生", readings:["がくせい"]},
-  {type:"yomi", kanji:"学校", readings:["がっこう"]},
-  {type:"yomi", kanji:"機会", readings:["きかい"]},
-  {type:"yomi", kanji:"機械", readings:["きかい"]},
-  {type:"yomi", kanji:"基本", readings:["きほん"]},
-  {type:"yomi", kanji:"規則", readings:["きそく"]},
-  {type:"yomi", kanji:"記録", readings:["きろく"]},
-  {type:"yomi", kanji:"希望", readings:["きぼう"]},
-  {type:"yomi", kanji:"技術", readings:["ぎじゅつ"]},
-  {type:"yomi", kanji:"休日", readings:["きゅうじつ"]},
-  {type:"yomi", kanji:"休憩", readings:["きゅうけい"]},
-  {type:"yomi", kanji:"救助", readings:["きゅうじょ"]},
-  {type:"yomi", kanji:"教育", readings:["きょういく"]},
-  {type:"yomi", kanji:"協力", readings:["きょうりょく"]},
-  {type:"yomi", kanji:"漁港", readings:["ぎょこう"]},
-  {type:"yomi", kanji:"近所", readings:["きんじょ"]},
-  {type:"yomi", kanji:"金融", readings:["きんゆう"]},
-  {type:"yomi", kanji:"空港", readings:["くうこう"]},
-  {type:"yomi", kanji:"空間", readings:["くうかん"]},
-  {type:"yomi", kanji:"経営", readings:["けいえい"]},
-  {type:"yomi", kanji:"経験", readings:["けいけん"]},
   {type:"yomi", kanji:"経済", readings:["けいざい"]},
-  {type:"yomi", kanji:"警察", readings:["けいさつ"]},
-  {type:"yomi", kanji:"計画", readings:["けいかく"]},
-  {type:"yomi", kanji:"計算", readings:["けいさん"]},
-
-  // 送り仮名（20例：告示の本則に忠実な基本例）
+  // 送り仮名（サンプル）
   {type:"okuri", kanji:"受け", okuri_choices:["受け入れ","受入れ","受入"], okuri_ans:"受け入れ"},
   {type:"okuri", kanji:"申し", okuri_choices:["申し込む","申込む"], okuri_ans:"申し込む"},
-  {type:"okuri", kanji:"引き", okuri_choices:["引っ張る","引張る"], okuri_ans:"引っ張る"},
-  {type:"okuri", kanji:"現れ", okuri_choices:["現れる","現る"], okuri_ans:"現れる"},
-  {type:"okuri", kanji:"表わ", okuri_choices:["表わす","表す"], okuri_ans:"表す"},
-  {type:"okuri", kanji:"著し", okuri_choices:["著しい","著い"], okuri_ans:"著しい"},
-  {type:"okuri", kanji:"絶え", okuri_choices:["絶える","絶る"], okuri_ans:"絶える"},
-  {type:"okuri", kanji:"受け取", okuri_choices:["受け取る","受取る"], okuri_ans:"受け取る"},
-  {type:"okuri", kanji:"打ち合わ", okuri_choices:["打ち合わせ","打合せ"], okuri_ans:"打ち合わせ"},
-  {type:"okuri", kanji:"見直", okuri_choices:["見直す","見直す（送りなし）"], okuri_ans:"見直す"},
-  {type:"okuri", kanji:"呼び出", okuri_choices:["呼び出す","呼出す"], okuri_ans:"呼び出す"},
-  {type:"okuri", kanji:"受け渡", okuri_choices:["受け渡し","受渡し"], okuri_ans:"受け渡し"},
-  {type:"okuri", kanji:"持ち帰", okuri_choices:["持ち帰る","持帰る"], okuri_ans:"持ち帰る"},
-  {type:"okuri", kanji:"組み合わ", okuri_choices:["組み合わせ","組合せ"], okuri_ans:"組み合わせ"},
-  {type:"okuri", kanji:"書き換", okuri_choices:["書き換える","書換える"], okuri_ans:"書き換える"},
-  {type:"okuri", kanji:"取り消", okuri_choices:["取り消す","取消す"], okuri_ans:"取り消す"},
-  {type:"okuri", kanji:"立ち入", okuri_choices:["立ち入る","立入る"], okuri_ans:"立ち入る"},
-  {type:"okuri", kanji:"受け止", okuri_choices:["受け止める","受止める"], okuri_ans:"受け止める"},
-  {type:"okuri", kanji:"受け継", okuri_choices:["受け継ぐ","受継ぐ"], okuri_ans:"受け継ぐ"},
-  {type:"okuri", kanji:"受け持", okuri_choices:["受け持つ","受持つ"], okuri_ans:"受け持つ"},
-
-  // 部首（20例：部首名は一般呼称）
+  // 部首（サンプル）
   {type:"bushu", kanji:"海", bushu:"さんずい"},
-  {type:"bushu", kanji:"湖", bushu:"さんずい"},
-  {type:"bushu", kanji:"洗", bushu:"さんずい"},
-  {type:"bushu", kanji:"投", bushu:"てへん"},
-  {type:"bushu", kanji:"持", bushu:"てへん"},
-  {type:"bushu", kanji:"描", bushu:"てへん"},
   {type:"bushu", kanji:"体", bushu:"にんべん"},
-  {type:"bushu", kanji:"住", bushu:"にんべん"},
-  {type:"bushu", kanji:"健", bushu:"にんべん"},
-  {type:"bushu", kanji:"林", bushu:"きへん"},
-  {type:"bushu", kanji:"橋", bushu:"きへん"},
-  {type:"bushu", kanji:"根", bushu:"きへん"},
-  {type:"bushu", kanji:"花", bushu:"くさかんむり"},
-  {type:"bushu", kanji:"草", bushu:"くさかんむり"},
-  {type:"bushu", kanji:"葉", bushu:"くさかんむり"},
-  {type:"bushu", kanji:"鉄", bushu:"かねへん"},
-  {type:"bushu", kanji:"銀", bushu:"かねへん"},
-  {type:"bushu", kanji:"鏡", bushu:"かねへん"},
-  {type:"bushu", kanji:"呼", bushu:"くちへん"},
-  {type:"bushu", kanji:"味", bushu:"くちへん"},
 ];
-setQuestion();
+updateHUD(); setQuestion();
 </script>
 </body>
 </html>
